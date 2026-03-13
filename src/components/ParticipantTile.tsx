@@ -1,58 +1,24 @@
-import React, { useRef, useEffect, memo, useState } from 'react';
-import { MicOff, User, MoreVertical, Hand, ShieldCheck, RefreshCw } from 'lucide-react';
+import React, { useRef, useEffect, memo } from 'react';
+import { MicOff, User, MoreVertical, Hand, ShieldCheck } from 'lucide-react';
 import { Participant } from '../types';
 import { cn } from '../lib/utils';
 
 interface ParticipantTileProps {
   participant: Participant;
   isMain?: boolean;
-  onReconnect?: (id: string) => void;
 }
 
-const ParticipantTileComponent: React.FC<ParticipantTileProps> = ({ participant, isMain, onReconnect }) => {
+const ParticipantTileComponent: React.FC<ParticipantTileProps> = ({ participant, isMain }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   useEffect(() => {
-    if (videoRef.current && participant?.stream) {
-      console.log(`Attaching stream to ${participant.name} tile. Tracks:`, participant.stream.getTracks().map(t => t.kind));
+    if (videoRef.current && participant.stream) {
       videoRef.current.srcObject = participant.stream;
-      
-      const playVideo = async () => {
-        try {
-          if (videoRef.current) {
-            // Ensure muted for local, unmuted for remote
-            videoRef.current.muted = participant.isLocal;
-            await videoRef.current.play();
-            setIsVideoPlaying(true);
-          }
-        } catch (e) {
-          console.warn("Autoplay blocked for:", participant.name, e);
-          setIsVideoPlaying(false);
-          
-          // Fallback: try playing muted if unmuted failed (browsers allow muted autoplay)
-          if (!participant.isLocal && videoRef.current) {
-            try {
-              videoRef.current.muted = true;
-              await videoRef.current.play();
-              console.log("Started muted autoplay as fallback for:", participant.name);
-            } catch (err) {
-              console.error("Muted fallback also failed:", err);
-            }
-          }
-        }
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current?.play().catch(e => console.error("Error playing video:", e));
       };
-
-      playVideo();
     }
-  }, [participant?.stream, participant?.isCameraOff, participant?.isLocal]);
-
-  const handleRefresh = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onReconnect) {
-      onReconnect(participant.id);
-    }
-  };
+  }, [participant.stream, participant.isCameraOff]);
 
   return (
     <div className={cn(
@@ -112,16 +78,7 @@ const ParticipantTileComponent: React.FC<ParticipantTileProps> = ({ participant,
       </div>
 
       {/* Status Indicators */}
-      <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        {!participant.isLocal && onReconnect && (
-          <button 
-            onClick={handleRefresh}
-            className="bg-black/40 backdrop-blur-md p-1.5 rounded-full hover:bg-indigo-500/40 transition-colors"
-            title="Refresh connection"
-          >
-            <RefreshCw className="w-4 h-4 text-white" />
-          </button>
-        )}
+      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="bg-black/40 backdrop-blur-md p-1.5 rounded-full">
           <MoreVertical className="w-4 h-4 text-white cursor-pointer" />
         </div>

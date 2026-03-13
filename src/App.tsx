@@ -19,8 +19,7 @@ export default function App() {
     const room = params.get('room');
     if (room) {
       setRoomCode(room);
-      // We no longer set view to 'meeting' directly
-      // This allows the user to enter their name on the dashboard first
+      setView('meeting');
     }
   }, []);
 
@@ -64,7 +63,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-zinc-950 font-sans antialiased text-zinc-100">
       {view === 'dashboard' ? (
-        <Dashboard onJoin={handleJoin} onCreate={handleCreate} initialRoomCode={roomCode} />
+        <Dashboard onJoin={handleJoin} onCreate={handleCreate} />
       ) : (
         <MeetingRoom 
           roomCode={roomCode} 

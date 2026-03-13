@@ -5,23 +5,13 @@ import { motion } from 'motion/react';
 interface DashboardProps {
   onJoin: (code: string, name: string) => void;
   onCreate: (secret: string, name: string) => void;
-  initialRoomCode?: string;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onJoin, onCreate, initialRoomCode }) => {
-  const [meetingCode, setMeetingCode] = useState(initialRoomCode || '');
+export const Dashboard: React.FC<DashboardProps> = ({ onJoin, onCreate }) => {
+  const [meetingCode, setMeetingCode] = useState('');
   const [adminSecret, setAdminSecret] = useState('');
   const [userName, setUserName] = useState('');
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [isJoiningViaLink, setIsJoiningViaLink] = useState(!!initialRoomCode);
-
-  // Update meeting code if initialRoomCode changes
-  React.useEffect(() => {
-    if (initialRoomCode) {
-      setMeetingCode(initialRoomCode);
-      setIsJoiningViaLink(true);
-    }
-  }, [initialRoomCode]);
 
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col text-zinc-100">
@@ -91,47 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onJoin, onCreate, initialR
               />
             </div>
 
-            {isJoiningViaLink && !showAdminLogin ? (
-              <div className="p-8 rounded-3xl bg-zinc-900 border border-orange-500/30 space-y-6 max-w-md shadow-2xl shadow-orange-500/10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4">
-                  <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">Join Meeting</h3>
-                  <p className="text-zinc-500 text-sm">You've been invited to join room <span className="text-orange-500 font-mono">{meetingCode}</span></p>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Your Display Name</label>
-                  <input
-                    type="text"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    placeholder="e.g. Rahul Sharma"
-                    autoFocus
-                    className="w-full px-4 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all text-white placeholder-zinc-700"
-                  />
-                </div>
-
-                <button 
-                  onClick={() => onJoin(meetingCode, userName)}
-                  className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold rounded-2xl transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 group"
-                >
-                  Join Now
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                
-                <button 
-                  onClick={() => {
-                    setMeetingCode('');
-                    setIsJoiningViaLink(false);
-                  }}
-                  className="w-full py-2 text-zinc-500 hover:text-zinc-300 text-xs font-medium"
-                >
-                  Join a different room instead
-                </button>
-              </div>
-            ) : showAdminLogin ? (
+            {showAdminLogin ? (
               <div className="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-4 max-w-md">
                 <h3 className="text-lg font-semibold text-white">Admin Meeting Creation</h3>
                 <div className="space-y-2">

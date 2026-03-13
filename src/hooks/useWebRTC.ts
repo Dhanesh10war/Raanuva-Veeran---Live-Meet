@@ -40,37 +40,26 @@ export const useWebRTC = (room: string, userName: string, isAdmin: boolean = fal
 
   const initializeLocalStream = async () => {
     try {
-      // Students don't need to initialize camera/mic immediately in a 100+ classroom
-      // unless they are the Admin or have been "called on"
-      if (!isAdmin && participants.length > 10) {
-        console.log("Joined as viewer in large classroom");
-        return null;
-      }
-
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 640 },
+          width: { ideal: 640 }, // Lower resolution for better scalability
           height: { ideal: 360 },
           frameRate: { ideal: 15 }
         },
         audio: true
       });
       localStreamRef.current = stream;
-      setParticipants(prev => {
-        const local = {
-          id: userId.current,
-          name: userName + (isAdmin ? ' (Admin)' : ''),
-          stream: stream,
-          isMuted: false,
-          isCameraOff: false,
-          isScreenSharing: false,
-          isHandRaised: false,
-          isLocal: true,
-          isHost: isAdmin
-        };
-        const others = prev.filter(p => !p.isLocal);
-        return [local, ...others];
-      });
+      setParticipants([{
+        id: userId.current,
+        name: userName + (isAdmin ? ' (Admin)' : ''),
+        stream: stream,
+        isMuted: false,
+        isCameraOff: false,
+        isScreenSharing: false,
+        isHandRaised: false,
+        isLocal: true,
+        isHost: isAdmin
+      }]);
       return stream;
     } catch (error) {
       console.error("Error accessing media devices:", error);
@@ -84,19 +73,17 @@ export const useWebRTC = (room: string, userName: string, isAdmin: boolean = fal
     socketRef.current = socket;
 
     socket.onopen = async () => {
-      // In a 100+ classroom, only Admin starts publishing immediately
-      const stream = isAdmin ? await initializeLocalStream() : null;
-      
-      socket.send(JSON.stringify({
-        type: 'join',
-        room,
-        userId: userId.current,
-        name: userName + (isAdmin ? ' (Admin)' : ''),
-        isAdmin
-      }));
-
+      const stream = await initializeLocalStream();
       if (stream) {
-        // Setup volume detection for Admin
+        socket.send(JSON.stringify({
+          type: 'join',
+          room,
+          userId: userId.current,
+          name: userName + (isAdmin ? ' (Admin)' : ''),
+          isAdmin
+        }));
+
+        // Setup volume detection
         const audioContext = new AudioContext();
         const source = audioContext.createMediaStreamSource(stream);
         const analyser = audioContext.createAnalyser();
@@ -111,7 +98,7 @@ export const useWebRTC = (room: string, userName: string, isAdmin: boolean = fal
           
           analyser.getByteFrequencyData(dataArray);
           const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-          const isSpeaking = average > 30;
+          const isSpeaking = average > 30; // Threshold
 
           if (isSpeaking !== lastSpeaking) {
             lastSpeaking = isSpeaking;
