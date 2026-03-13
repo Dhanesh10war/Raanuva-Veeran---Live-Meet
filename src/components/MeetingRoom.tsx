@@ -57,12 +57,11 @@ export const MeetingRoom: React.FC<MeetingRoomProps> = ({ roomCode, userName, is
   // Grid layout optimization
   const getTileStyles = (count: number) => {
     if (count === 1) return "w-full max-w-5xl aspect-video";
-    if (count === 2) return "w-full md:w-[calc(48%-16px)] aspect-video max-w-3xl";
-    if (count === 3) return "w-[calc(48%-16px)] aspect-video max-w-2xl";
-    if (count === 4) return "w-[calc(48%-16px)] aspect-video max-w-2xl";
-    if (count <= 6) return "w-[calc(48%-16px)] md:w-[calc(32%-16px)] aspect-video max-w-xl";
-    if (count <= 9) return "w-[calc(32%-16px)] aspect-video max-w-lg";
-    return "w-[calc(32%-16px)] lg:w-[calc(24%-16px)] aspect-video max-w-md";
+    if (count === 2) return "w-full md:w-[calc(50%-12px)] aspect-video";
+    if (count <= 4) return "w-[calc(50%-12px)] aspect-video";
+    if (count <= 6) return "w-[calc(50%-12px)] md:w-[calc(33.333%-12px)] aspect-video";
+    if (count <= 9) return "w-[calc(33.333%-12px)] aspect-video";
+    return "w-[calc(33.333%-12px)] lg:w-[calc(25%-12px)] aspect-video";
   };
 
   const activeSpeaker = useMemo(() => 
@@ -78,20 +77,20 @@ export const MeetingRoom: React.FC<MeetingRoomProps> = ({ roomCode, userName, is
   return (
     <div className="h-screen bg-zinc-950 flex flex-col overflow-hidden text-zinc-100">
       {/* Header Info */}
-      <div className="absolute top-3 left-4 z-20 flex items-center gap-2">
-        <div className="bg-zinc-900/80 backdrop-blur-xl px-3 py-1.5 rounded-xl border border-zinc-800 flex items-center gap-3 shadow-2xl">
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-            <span className="text-white text-xs font-bold tracking-tight">{roomCode}</span>
+      <div className="absolute top-4 left-6 z-20 flex items-center gap-3">
+        <div className="bg-zinc-900/80 backdrop-blur-xl px-4 py-2 rounded-2xl border border-zinc-800 flex items-center gap-4 shadow-2xl">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+            <span className="text-white text-sm font-bold tracking-tight">{roomCode}</span>
           </div>
-          <div className="h-3 w-px bg-zinc-800" />
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <Users className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-bold">{participants.length}</span>
+          <div className="h-4 w-px bg-zinc-800" />
+          <div className="flex items-center gap-2 text-zinc-400">
+            <Users className="w-4 h-4" />
+            <span className="text-xs font-bold">{participants.length}</span>
           </div>
           {isAdmin && (
-            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-orange-500/10 border border-orange-500/20 text-orange-500 text-[9px] font-black uppercase tracking-tighter">
-              <ShieldCheck className="w-2.5 h-2.5" />
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-orange-500/10 border border-orange-500/20 text-orange-500 text-[10px] font-black uppercase tracking-tighter">
+              <ShieldCheck className="w-3 h-3" />
               Admin
             </div>
           )}
@@ -99,10 +98,10 @@ export const MeetingRoom: React.FC<MeetingRoomProps> = ({ roomCode, userName, is
 
         <button 
           onClick={handleShare}
-          className="bg-zinc-900/80 backdrop-blur-xl px-3 py-1.5 rounded-xl border border-zinc-800 flex items-center gap-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all shadow-2xl group"
+          className="bg-zinc-900/80 backdrop-blur-xl px-4 py-2 rounded-2xl border border-zinc-800 flex items-center gap-2 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all shadow-2xl group"
         >
-          <Share2 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-          <span className="text-[10px] font-bold">{copied ? 'Copied!' : 'Copy Link'}</span>
+          <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span className="text-xs font-bold">{copied ? 'Copied!' : 'Copy Link'}</span>
         </button>
       </div>
 
@@ -123,12 +122,12 @@ export const MeetingRoom: React.FC<MeetingRoomProps> = ({ roomCode, userName, is
               </div>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-4 w-full h-full max-w-7xl mx-auto justify-center items-center content-center overflow-y-auto scrollbar-hide py-8 px-4">
+            <div className="flex flex-wrap gap-3 md:gap-4 w-full h-full max-w-7xl mx-auto items-center justify-center content-center overflow-y-auto scrollbar-hide py-8">
               {participants.map(p => (
                 <div 
                   key={p.id} 
                   className={cn(
-                    "transition-all duration-500 ease-in-out shrink-0 flex items-center justify-center",
+                    "transition-all duration-500 ease-in-out",
                     getTileStyles(participants.length)
                   )}
                 >

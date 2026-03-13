@@ -37,7 +37,7 @@ export const ControlBar: React.FC<ControlBarProps> = ({
   onEndMeeting, participantCount, isAdmin
 }) => {
   return (
-    <div className="h-16 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between px-6 shrink-0">
+    <div className="h-20 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between px-6 shrink-0">
       {/* Left Info */}
       <div className="hidden md:flex items-center gap-4 w-1/4">
         <span className="text-white font-medium">Meeting details</span>
